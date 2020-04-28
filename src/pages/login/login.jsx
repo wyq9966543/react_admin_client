@@ -27,7 +27,7 @@ class Login extends Component {
                     storageUtils.saveUser(user)//保存到本地
 
                     //跳转管理界面(不需要回退用replace)
-                    this.props.history.push('/')
+                    this.props.history.push('/home')
                 }else {
                     message.error(result.msg)
                 }

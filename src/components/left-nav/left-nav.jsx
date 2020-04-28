@@ -1,11 +1,13 @@
 import React, {Component} from 'react'
 import {Link, withRouter} from 'react-router-dom'
 import {Menu, Icon} from 'antd'
+import {connect} from "react-redux"
 
 import './left-nav.less'
 import logo from '../../assets/images/logo.png'
 import menuList from '../../config/menuConfig'
 import memoryUtils from '../../utils/memoryUtils'
+import {setHeadTitle} from '../../redux/actions'
 
 const { SubMenu } = Menu
 
@@ -65,20 +67,27 @@ class LeftNav extends Component {
     //根据menu的数据数组生成对应的标签数组
     //   使用reduce() + 递归调用
     getMenuNodes = (menuList) => {
+        //得到当前请求路径
+        const path = this.props.location.pathname
         return menuList.reduce((pre,item) => {
             //根据当前用户权限显示用户列表
             if (this.hasAuth(item)) {
                 // 向pre添加<Menu.Item>
                 if(!item.children) {
+                    //判断item是否是当前对应的item
+                    if (item.key===path || path.indexOf(item.key)===0) {
+                        //更新redux中的head状态
+                        this.props.setHeadTitle(item.title)
+                    }
+                    
                     pre.push((<Menu.Item key={item.key}>
-                            <Link to={item.key}>
+                            <Link to={item.key} onClick={() => this.props.setHeadTitle(item.title)}>
                                 <Icon type={item.icon}/>
                                 <span>{item.title}</span>
                             </Link>
                         </Menu.Item>
                     ))
                 }else {
-                    let path = this.props.location.pathname
                     // 查找一个与当前请求路径匹配的子Item
                     const cItem = item.children.find(cItem => path.indexOf(cItem.key)===0)
                     // 如果存在, 说明当前item的子列表需要打开
@@ -122,7 +131,6 @@ class LeftNav extends Component {
         }
         // 得到需要打开菜单项的key
         const openKey = this.openKey
-
         return (
             <div>
                 <div  className='left-nav'>
@@ -148,4 +156,7 @@ withRouter高阶组件:
 包装非路由组件, 返回一个新的组件
 新的组件向非路由组件传递3个属性: history/location/match
  */
-export default withRouter(LeftNav)
+export default connect(
+    state =>({}),
+    {setHeadTitle}
+)(withRouter(LeftNav))
