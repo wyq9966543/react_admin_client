@@ -7,9 +7,8 @@ import LinkButton from "../link-button/link-button"
 import {reqWeather} from '../../api/index'
 import menuList from "../../config/menuConfig"
 import {formateDate} from '../../utils/dateUtils'
-import memoryUtils from '../../utils/memoryUtils'
-import storageUtils from '../../utils/storageUtils'
 import './header.less'
+import {logout} from '../../redux/actions'
 
 class Header extends Component {
 
@@ -55,12 +54,8 @@ class Header extends Component {
         Modal.confirm({
             content: '确定退出吗?',
             onOk: () => {
-                console.log('OK', this)
-                // 删除保存的user数据
-                storageUtils.removeUser()
-                memoryUtils.user = {}
-                // 跳转到login
-                this.props.history.replace('/login')
+                //console.log('OK', this)
+                this.props.logout()
             }
         })
     }
@@ -79,7 +74,7 @@ class Header extends Component {
     }
 
     render() {
-        const username = memoryUtils.user.username
+        const username = this.props.user.username
         const {currentTime, dayPictureUrl, weather} = this.state
         //const title = this.getTitle()
         const title = this.props.headTitle
@@ -103,7 +98,7 @@ class Header extends Component {
 }
 
 export default connect(
-    state => ({headTitle: state.headTitle}),
-    {}
+    state => ({headTitle: state.headTitle, user: state.user}),
+    {logout}
 )(withRouter(Header))
     
